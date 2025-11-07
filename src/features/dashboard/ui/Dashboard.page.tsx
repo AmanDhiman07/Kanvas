@@ -6,7 +6,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[#DDC3C3]">
       <Navbar />
       <main className="container mx-auto px-6 py-8">
-        <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex items-start">
           <button
             className="px-8 py-4 rounded-xl text-[#6B3F69] font-medium text-lg
                        bg-[#8D5F8C]/30 backdrop-blur-md border border-[#8D5F8C]/40
