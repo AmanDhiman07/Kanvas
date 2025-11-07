@@ -61,8 +61,23 @@ class HttpClient {
         data = await response.json();
       } else {
         const text = await response.text();
+        // Extract meaningful error message from HTML responses
+        let errorMessage = 'Invalid response format';
+        if (text) {
+          // Try to extract error message from HTML
+          const match = text.match(/<pre>(.*?)<\/pre>/i) || text.match(/Cannot (.*?)$/i);
+          if (match && match[1]) {
+            errorMessage = match[1].trim();
+          } else if (text.length < 200) {
+            // If it's a short text response, use it directly
+            errorMessage = text.trim();
+          } else {
+            // For long HTML, provide a generic message
+            errorMessage = `Server error (${response.status}): ${response.statusText}`;
+          }
+        }
         throw {
-          message: text || 'Invalid response format',
+          message: errorMessage,
           status: response.status,
           data: text,
         } as ApiError;
