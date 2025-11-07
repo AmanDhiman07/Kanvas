@@ -5,13 +5,13 @@ import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, loading, error } = useAuth();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await login({ username, password });
+    await login({ email, password });
   };
 
   return (
@@ -28,16 +28,15 @@ export default function LoginPage() {
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-[#6B3F69] mb-2">
-                Username
+              <label htmlFor="email" className="block text-sm font-medium text-[#6B3F69] mb-2">
+                Email
               </label>
               <Input
-                id="username"
+                id="email"
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username"
-                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
                 className="w-full bg-white/50 border-[#8D5F8C]/40 text-[#6B3F69] placeholder:text-[#6B3F69]/60 focus-visible:ring-[#8D5F8C]"
               />
             </div>
@@ -52,14 +51,16 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                required
                 className="w-full bg-white/50 border-[#8D5F8C]/40 text-[#6B3F69] placeholder:text-[#6B3F69]/60 focus-visible:ring-[#8D5F8C]"
               />
             </div>
 
             {error && (
               <div className="p-3 rounded-md bg-red-100/50 border border-red-300/40">
-                <p className="text-sm text-red-700">{error.message}</p>
+                <p className="text-sm text-red-700 font-medium">Error: {error.message}</p>
+                {error.status && (
+                  <p className="text-xs text-red-600 mt-1">Status: {error.status}</p>
+                )}
               </div>
             )}
 

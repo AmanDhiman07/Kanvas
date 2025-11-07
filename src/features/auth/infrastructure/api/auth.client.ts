@@ -3,17 +3,26 @@ import type { LoginRequest, LoginResponse } from './auth.types';
 
 export const authClient = {
   async login(credentials: LoginRequest): Promise<LoginResponse> {
-    const response = await httpClient.post<LoginResponse>('/auth/login', credentials);
-    
-    if (response.data) {
-      // Store token in localStorage
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+    try {
+      const response = await httpClient.post<LoginResponse>('/auth/login', credentials);
       
-      return response.data;
+      // The API response structure is: { success, message, user, token }
+      // The httpClient wraps it, so response.data contains the original response
+      const loginData = response.data as LoginResponse;
+      
+      if (loginData && loginData.token && loginData.user) {
+        // Store token in localStorage
+        localStorage.setItem('token', loginData.token);
+        localStorage.setItem('user', JSON.stringify(loginData.user));
+        
+        return loginData;
+      }
+      
+      throw new Error('Login failed: Invalid response format');
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
     }
-    
-    throw new Error('Login failed: No data received');
   },
 
   async logout(): Promise<void> {
