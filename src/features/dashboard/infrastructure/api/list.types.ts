@@ -3,7 +3,10 @@ export interface CreateListRequest {
 }
 
 export interface List {
+  id: string;
   title: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateListResponse {
@@ -13,5 +16,12 @@ export interface CreateListResponse {
   data: {
     title: string;
   };
+}
+
+export interface GetListsResponse {
+  status: boolean;
+  message: string;
+  statusCode: number;
+  data: List[];
 }
 

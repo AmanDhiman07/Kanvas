@@ -29,7 +29,7 @@ export function AddListForm({ onAdd, onCancel, loading = false }: AddListFormPro
   };
 
   return (
-    <div className="w-72 bg-[#8D5F8C]/40 backdrop-blur-md rounded-lg p-3 border border-[#8D5F8C]/40 shadow-lg">
+    <div className="w-72 flex-shrink-0 bg-[#8D5F8C]/40 backdrop-blur-md rounded-lg p-3 border border-[#8D5F8C]/40 shadow-lg">
       <form onSubmit={handleSubmit} className="space-y-2">
         <Input
           type="text"

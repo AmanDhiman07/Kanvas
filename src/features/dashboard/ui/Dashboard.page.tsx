@@ -6,7 +6,7 @@ import { useList } from '../hooks/useList';
 
 export default function DashboardPage() {
   const [isAddingList, setIsAddingList] = useState(false);
-  const { lists, loading, error, createList } = useList();
+  const { lists, loading, creating, error, createList } = useList();
 
   const handleAddList = () => {
     setIsAddingList(true);
@@ -25,25 +25,31 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#DDC3C3]">
+    <div className="min-h-screen bg-[#DDC3C3] flex flex-col">
       <Navbar />
-      <main className="container mx-auto px-6 py-8">
-        <div className="flex items-start gap-4 flex-wrap">
+      <main className="flex-1 container mx-auto px-6 py-8 overflow-x-auto" style={{ scrollbarWidth: 'thin', scrollbarGutter: 'stable' }}>
+        <div className="flex items-start gap-4 pb-4 min-w-max">
           {/* Display created lists */}
-          {lists.map((list, index) => (
+          {lists.map((list) => (
             <div
-              key={index}
-              className="w-72 bg-[#8D5F8C]/40 backdrop-blur-md rounded-lg p-4 border border-[#8D5F8C]/40 shadow-lg"
+              key={list.id}
+              className="w-72 flex-shrink-0 bg-[#8D5F8C]/40 backdrop-blur-md rounded-lg p-4 border border-[#8D5F8C]/40 shadow-lg"
             >
               <h3 className="text-[#6B3F69] font-semibold text-lg">{list.title}</h3>
             </div>
           ))}
           
+          {loading && lists.length === 0 && (
+            <div className="w-72 flex-shrink-0 bg-[#8D5F8C]/40 backdrop-blur-md rounded-lg p-4 border border-[#8D5F8C]/40 shadow-lg">
+              <p className="text-[#6B3F69] text-sm">Loading lists...</p>
+            </div>
+          )}
+          
           {isAddingList && (
             <AddListForm 
               onAdd={handleListAdded} 
               onCancel={handleCancel}
-              loading={loading}
+              loading={creating}
             />
           )}
           
@@ -58,7 +64,7 @@ export default function DashboardPage() {
             className="px-8 py-4 rounded-xl text-[#6B3F69] font-medium text-lg
                        bg-[#8D5F8C]/30 backdrop-blur-md border border-[#8D5F8C]/40
                        hover:bg-[#8D5F8C]/40 transition-all duration-300
-                       flex items-center gap-2 shadow-lg whitespace-nowrap"
+                       flex items-center gap-2 shadow-lg whitespace-nowrap flex-shrink-0"
             style={{
               backdropFilter: 'blur(10px)',
               WebkitBackdropFilter: 'blur(10px)',
