@@ -36,22 +36,21 @@ export function AddCardForm({ onAdd, onCancel, loading = false }: AddCardFormPro
         onChange={(e) => setCardTitle(e.target.value)}
         placeholder="Enter card title..."
         autoFocus
-        className="w-full bg-white/80 border-[#8D5F8C]/40 text-[#6B3F69] placeholder:text-[#6B3F69]/60 focus-visible:ring-[#8D5F8C]"
       />
       <div className="flex items-center gap-2">
         <Button
           type="submit"
           disabled={loading}
-          className="bg-[#8D5F8C] hover:bg-[#8D5F8C]/80 text-white px-4 py-2 text-sm disabled:opacity-50"
+          size="sm"
         >
           {loading ? 'Adding...' : 'Add Card'}
         </Button>
         <button
           type="button"
           onClick={handleCancel}
-          className="p-2 hover:bg-[#8D5F8C]/20 rounded transition-colors"
+          className="p-2 hover:bg-[var(--primary-purple)]/10 rounded-lg transition-colors"
         >
-          <X className="w-4 h-4 text-[#6B3F69]" />
+          <X className="w-4 h-4 text-[var(--text-primary)]" />
         </button>
       </div>
     </form>

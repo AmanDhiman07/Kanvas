@@ -45,7 +45,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#DDC3C3] flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 container mx-auto px-6 py-8 overflow-x-auto" style={{ scrollbarWidth: 'thin', scrollbarGutter: 'stable' }}>
         <div className="flex items-start gap-4 pb-4 min-w-max">
@@ -62,37 +62,42 @@ export default function DashboardPage() {
               />
             );
           })}
-          
+
           {loading && lists.length === 0 && (
-            <div className="w-72 flex-shrink-0 bg-[#8D5F8C]/40 backdrop-blur-md rounded-lg p-4 border border-[#8D5F8C]/40 shadow-lg">
-              <p className="text-[#6B3F69] text-sm">Loading lists...</p>
+            <div className="w-72 flex-shrink-0 bg-white/40 backdrop-blur-2xl rounded-2xl p-4 border-2 border-white/40 shadow-lg">
+              <p className="text-[var(--text-primary)] text-sm font-medium">Loading lists...</p>
             </div>
           )}
-          
+
           {isAddingList && (
-            <AddListForm 
-              onAdd={handleListAdded} 
+            <AddListForm
+              onAdd={handleListAdded}
               onCancel={handleCancel}
               loading={creating}
             />
           )}
-          
+
           {error && (
-            <div className="w-full p-3 rounded-md bg-red-100/50 border border-red-300/40">
-              <p className="text-sm text-red-700">Error: {error.message}</p>
+            <div className="w-full p-4 rounded-xl bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-200/60 backdrop-blur-sm animate-fade-in">
+              <div className="flex items-start gap-3">
+                <svg className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                <div className="flex-1">
+                  <p className="text-sm text-red-800 font-semibold">{error.message}</p>
+                </div>
+              </div>
             </div>
           )}
-          
+
           <button
             onClick={handleAddList}
-            className="px-8 py-4 rounded-xl text-[#6B3F69] font-medium text-lg
-                       bg-[#8D5F8C]/30 backdrop-blur-md border border-[#8D5F8C]/40
-                       hover:bg-[#8D5F8C]/40 transition-all duration-300
-                       flex items-center gap-2 shadow-lg whitespace-nowrap flex-shrink-0"
-            style={{
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-            }}
+            className="px-8 py-4 rounded-2xl font-semibold text-base text-white
+                       bg-gradient-to-r from-[var(--primary-purple)] via-[var(--primary-magenta)] to-[var(--primary-rose)]
+                       hover:shadow-[0_8px_24px_hsla(320,70%,60%,0.4)] hover:scale-105
+                       transition-all duration-300
+                       flex items-center gap-2 shadow-lg whitespace-nowrap flex-shrink-0
+                       active:scale-100"
           >
             <Plus className="w-5 h-5" />
             <span>Add List</span>

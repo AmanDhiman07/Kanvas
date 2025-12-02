@@ -38,21 +38,23 @@ export function ListCard({ listId, listTitle, cards, onAddCard }: ListCardProps)
   };
 
   return (
-    <Card className="w-72 flex-shrink-0 bg-[#8D5F8C]/40 backdrop-blur-md border-[#8D5F8C]/40 shadow-lg">
+    <Card className="w-72 flex-shrink-0 animate-fade-in">
       <CardHeader className="pb-3">
-        <CardTitle className="text-[#6B3F69] font-semibold text-lg">{listTitle}</CardTitle>
+        <CardTitle className="text-[var(--text-primary)] font-bold text-lg">
+          {listTitle}
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto">
         {/* Display cards */}
         {cards.map((card) => (
           <div
             key={card.id}
-            className="bg-white rounded-md p-3 border border-gray-200 shadow-sm"
+            className="bg-white/90 backdrop-blur-sm rounded-xl p-3 border-2 border-white/60 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer"
           >
-            <p className="text-black text-sm">{card.title}</p>
+            <p className="text-[var(--text-primary)] text-sm font-medium">{card.title}</p>
           </div>
         ))}
-        
+
         {/* Add Card Form */}
         {isAddingCard && (
           <AddCardForm
@@ -61,13 +63,13 @@ export function ListCard({ listId, listTitle, cards, onAddCard }: ListCardProps)
             loading={addingCardLoading}
           />
         )}
-        
+
         {/* Add Card Button */}
         {!isAddingCard && (
           <Button
             onClick={() => setIsAddingCard(true)}
             variant="ghost"
-            className="w-full justify-start text-[#6B3F69] hover:bg-[#8D5F8C]/20"
+            className="w-full justify-start text-[var(--primary-purple)] hover:bg-[var(--primary-purple)]/10 hover:text-[var(--primary-magenta)] transition-all duration-300"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add a card
