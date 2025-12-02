@@ -1,29 +1,51 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap');
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #DDC3C3;
-  color: #6B3F69;
+  background: linear-gradient(135deg, #e8d4f8 0%, #f5e6f8 25%, #fae8e8 50%, #ffe9d6 75%, #fff4d6 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  color: var(--text-primary);
 }
 
-/* Custom scrollbar styling for horizontal scrolling */
-.overflow-x-auto::-webkit-scrollbar {
+/* Enhanced scrollbar styling */
+::-webkit-scrollbar {
+  width: 12px;
   height: 12px;
 }
 
+::-webkit-scrollbar-track {
+  background: hsla(290, 20%, 90%, 0.5);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, hsl(290, 60%, 45%), hsl(320, 55%, 50%));
+  border-radius: 8px;
+  border: 2px solid hsla(290, 20%, 90%, 0.5);
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, hsl(280, 65%, 40%), hsl(310, 60%, 45%));
+  box-shadow: 0 0 8px hsla(320, 70%, 60%, 0.4);
+}
+
+/* Custom horizontal scrollbar */
+.overflow-x-auto::-webkit-scrollbar {
+  height: 10px;
+}
+
 .overflow-x-auto::-webkit-scrollbar-track {
-  background: #DDC3C3;
+  background: hsla(290, 20%, 90%, 0.3);
   border-radius: 6px;
 }
 
 .overflow-x-auto::-webkit-scrollbar-thumb {
-  background: #8D5F8C;
+  background: linear-gradient(90deg, hsl(290, 60%, 45%), hsl(320, 55%, 50%));
   border-radius: 6px;
-  border: 2px solid #DDC3C3;
-}
-
-.overflow-x-auto::-webkit-scrollbar-thumb:hover {
-  background: #6B3F69;
+  border: 2px solid hsla(290, 20%, 90%, 0.3);
 }
