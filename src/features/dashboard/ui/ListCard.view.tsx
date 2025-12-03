@@ -3,16 +3,12 @@ import { Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { AddCardForm } from './AddCardForm.view';
-
-interface Card {
-  id: string;
-  title: string;
-}
+import type { Card as CardType } from '../infrastructure/api/list.types';
 
 interface ListCardProps {
   listId: string;
   listTitle: string;
-  cards: Card[];
+  cards: CardType[];
   onAddCard: (listId: string, cardTitle: string) => Promise<boolean>;
 }
 
@@ -46,12 +42,12 @@ export function ListCard({ listId, listTitle, cards, onAddCard }: ListCardProps)
       </CardHeader>
       <CardContent className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto">
         {/* Display cards */}
-        {cards.map((card) => (
+        {cards.map((cardItem) => (
           <div
-            key={card.id}
+            key={cardItem._id}
             className="bg-white/90 backdrop-blur-sm rounded-xl p-3 border-2 border-white/60 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer"
           >
-            <p className="text-[var(--text-primary)] text-sm font-medium">{card.title}</p>
+            <p className="text-[var(--text-primary)] text-sm font-medium">{cardItem.card}</p>
           </div>
         ))}
 

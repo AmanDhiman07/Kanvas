@@ -25,13 +25,13 @@ class HttpClient {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
-    
+
     console.log('🌐 API Request:', {
       method: options.method || 'GET',
       url,
       body: options.body,
     });
-    
+
     const defaultHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
     };
@@ -52,11 +52,11 @@ class HttpClient {
 
     try {
       const response = await fetch(url, config);
-      
+
       // Check if response is JSON
       const contentType = response.headers.get('content-type');
       let data;
-      
+
       if (contentType && contentType.includes('application/json')) {
         data = await response.json();
       } else {
@@ -85,11 +85,11 @@ class HttpClient {
 
       // Check if response indicates failure (either HTTP status or response status field)
       const isErrorResponse = !response.ok || (data.status === false) || (data.success === false);
-      
+
       if (isErrorResponse) {
         // Handle different error response formats
         let errorMessage = 'An error occurred';
-        
+
         if (data.message) {
           errorMessage = data.message;
         } else if (data.error) {
@@ -99,7 +99,7 @@ class HttpClient {
         } else if (typeof data === 'string') {
           errorMessage = data;
         }
-        
+
         throw {
           message: errorMessage,
           status: response.status || data.statusCode || 400,
@@ -117,7 +117,7 @@ class HttpClient {
       // Handle both 'success' and 'status' fields
       const hasSuccessField = data.success !== undefined;
       const hasStatusField = data.status !== undefined;
-      
+
       if (hasSuccessField || hasStatusField) {
         const success = hasSuccessField ? data.success : data.status;
         const result = {
@@ -138,12 +138,12 @@ class HttpClient {
       return result;
     } catch (error) {
       console.error('❌ API Error:', error);
-      
+
       // If it's already an ApiError, re-throw it
       if (error && typeof error === 'object' && 'message' in error) {
         throw error as ApiError;
       }
-      
+
       // Handle network errors (CORS, connection refused, etc.)
       if (error instanceof TypeError && error.message.includes('fetch')) {
         throw {
@@ -151,7 +151,7 @@ class HttpClient {
           data: error,
         } as ApiError;
       }
-      
+
       throw {
         message: 'Network error or server unavailable',
         data: error,

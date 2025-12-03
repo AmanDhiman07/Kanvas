@@ -2,9 +2,16 @@ export interface CreateListRequest {
   title: string;
 }
 
+export interface Card {
+  card: string;
+  _id: string;
+  createdAt: string;
+}
+
 export interface List {
   id: string;
   title: string;
+  cards: Card[];
   createdAt: string;
   updatedAt: string;
 }

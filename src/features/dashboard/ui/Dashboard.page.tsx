@@ -5,16 +5,9 @@ import { AddListForm } from './AddListForm.view';
 import { ListCard } from './ListCard.view';
 import { useList } from '../hooks/useList';
 
-interface Card {
-  id: string;
-  title: string;
-  listId: string;
-}
-
 export default function DashboardPage() {
   const [isAddingList, setIsAddingList] = useState(false);
-  const [cards, setCards] = useState<Card[]>([]);
-  const { lists, loading, creating, error, createList } = useList();
+  const { lists, loading, creating, error, createList, fetchLists } = useList();
 
   const handleAddList = () => {
     setIsAddingList(true);
@@ -33,15 +26,18 @@ export default function DashboardPage() {
   };
 
   const handleAddCard = async (listId: string, cardTitle: string): Promise<boolean> => {
-    // TODO: Implement card creation API call
-    // For now, add card to local state
-    const newCard: Card = {
-      id: `${Date.now()}-${Math.random()}`,
-      title: cardTitle,
-      listId,
-    };
-    setCards((prev) => [...prev, newCard]);
-    return true;
+    try {
+      const { cardClient } = await import('../infrastructure/api/card.client');
+      await cardClient.addCard(listId, cardTitle);
+
+      // Refetch lists to get updated cards data from the server
+      await fetchLists();
+
+      return true;
+    } catch (error) {
+      console.error('Failed to add card:', error);
+      return false;
+    }
   };
 
   return (
@@ -49,19 +45,16 @@ export default function DashboardPage() {
       <Navbar />
       <main className="flex-1 container mx-auto px-6 py-8 overflow-x-auto" style={{ scrollbarWidth: 'thin', scrollbarGutter: 'stable' }}>
         <div className="flex items-start gap-4 pb-4 min-w-max">
-          {/* Display created lists */}
-          {lists.map((list) => {
-            const listCards = cards.filter((card) => card.listId === list.id);
-            return (
-              <ListCard
-                key={list.id}
-                listId={list.id}
-                listTitle={list.title}
-                cards={listCards}
-                onAddCard={handleAddCard}
-              />
-            );
-          })}
+          {/* Display created lists with their cards */}
+          {lists.map((list) => (
+            <ListCard
+              key={list.id}
+              listId={list.id}
+              listTitle={list.title}
+              cards={list.cards}
+              onAddCard={handleAddCard}
+            />
+          ))}
 
           {loading && lists.length === 0 && (
             <div className="w-72 flex-shrink-0 bg-white/40 backdrop-blur-2xl rounded-2xl p-4 border-2 border-white/40 shadow-lg">
