@@ -32,3 +32,17 @@ export interface GetListsResponse {
   data: List[];
 }
 
+export interface MoveListRequest {
+  listId: string;
+  newPosition: number;
+}
+
+export interface MoveListResponse {
+  status: boolean;
+  message: string;
+  statusCode: number;
+  data: {
+    success: boolean;
+  };
+}
+

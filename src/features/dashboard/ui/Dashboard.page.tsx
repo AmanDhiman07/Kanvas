@@ -11,7 +11,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import type { DragEndEvent, DragOverEvent, DragStartEvent } from '@dnd-kit/core';
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, horizontalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import type { Card } from '../infrastructure/api/list.types';
 
@@ -69,9 +69,9 @@ export default function DashboardPage() {
       const { cardClient } = await import('../infrastructure/api/card.client');
       await cardClient.addCard(listId, cardTitle);
 
-      // Optionally refetch to sync with server (in background, don't await)
+      // TODO: Uncomment this once backend properly persists card/list positions
       // This will replace the temp ID with the real server ID
-      fetchLists();
+      // fetchLists();
 
       return true;
     } catch (error) {
@@ -91,56 +91,12 @@ export default function DashboardPage() {
     }
   };
 
-  const handleDragOver = (event: DragOverEvent) => {
-    const { active, over } = event;
-    if (!over) return;
-
-    const activeData = active.data.current;
-    const overData = over.data.current;
-
-    // Only handle card dragging over lists or other cards
-    if (activeData?.type === 'card') {
-      const activeListId = activeData.listId;
-      let overListId = overData?.listId;
-
-      // If dragging over a list container, use that list's id
-      if (overData?.type === 'list') {
-        overListId = over.id as string;
-      }
-
-      if (!overListId || activeListId === overListId) return;
-
-      // Move card between lists
-      setLists((prevLists) => {
-        const activeList = prevLists.find((list) => list.id === activeListId);
-        const overList = prevLists.find((list) => list.id === overListId);
-
-        if (!activeList || !overList) return prevLists;
-
-        const activeCardIndex = activeList.cards.findIndex((c) => c._id === active.id);
-        const activeCardData = activeList.cards[activeCardIndex];
-
-        if (!activeCardData) return prevLists;
-
-        return prevLists.map((list) => {
-          if (list.id === activeListId) {
-            return {
-              ...list,
-              cards: list.cards.filter((c) => c._id !== active.id),
-            };
-          } else if (list.id === overListId) {
-            return {
-              ...list,
-              cards: [...list.cards, activeCardData],
-            };
-          }
-          return list;
-        });
-      });
-    }
+  const handleDragOver = () => {
+    // Only used for visual feedback, no state changes here
+    // The actual move happens in handleDragEnd
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveCard(null);
 
@@ -151,24 +107,102 @@ export default function DashboardPage() {
 
     // Handle list reordering
     if (activeData?.type === 'list' && active.id !== over.id) {
-      setLists((prevLists) => {
-        const oldIndex = prevLists.findIndex((list) => list.id === active.id);
-        const newIndex = prevLists.findIndex((list) => list.id === over.id);
-        return arrayMove(prevLists, oldIndex, newIndex);
-      });
+      const oldIndex = lists.findIndex((list) => list.id === active.id);
+      const newIndex = lists.findIndex((list) => list.id === over.id);
+
+      if (oldIndex === -1 || newIndex === -1) return;
+
+      // Update UI immediately
+      const newLists = arrayMove(lists, oldIndex, newIndex);
+      setLists(newLists);
+
+      // Save to backend
+      try {
+        const { listClient } = await import('../infrastructure/api/list.client');
+        await listClient.moveList({
+          listId: active.id as string,
+          newPosition: newIndex,
+        });
+        console.log('✅ List moved and saved to backend');
+      } catch (error) {
+        console.error('❌ Failed to save list position:', error);
+        // Don't revert UI - keep the change visible
+      }
+      return;
     }
 
-    // Handle card reordering within the same list
-    if (activeData?.type === 'card' && overData?.type === 'card') {
-      const activeListId = activeData.listId;
-      const overListId = overData.listId;
+    // Handle card movement
+    if (activeData?.type === 'card') {
+      const fromListId = activeData.listId;
+      let toListId = fromListId;
 
-      if (activeListId === overListId) {
+      // Determine target list
+      if (overData?.type === 'list') {
+        toListId = over.id as string;
+      } else if (overData?.type === 'card') {
+        toListId = overData.listId;
+      }
+
+      // If moving between different lists
+      if (fromListId !== toListId) {
+        // Update UI immediately
+        setLists((prevLists) => {
+          const sourceList = prevLists.find((list) => list.id === fromListId);
+          const targetList = prevLists.find((list) => list.id === toListId);
+
+          if (!sourceList || !targetList) return prevLists;
+
+          const cardToMove = sourceList.cards.find((c) => c._id === active.id);
+          if (!cardToMove) return prevLists;
+
+          return prevLists.map((list) => {
+            if (list.id === fromListId) {
+              return {
+                ...list,
+                cards: list.cards.filter((c) => c._id !== active.id),
+              };
+            } else if (list.id === toListId) {
+              // If dropping on a specific card, insert at that position
+              if (overData?.type === 'card') {
+                const targetIndex = list.cards.findIndex((c) => c._id === over.id);
+                const newCards = [...list.cards];
+                newCards.splice(targetIndex, 0, cardToMove);
+                return { ...list, cards: newCards };
+              }
+              // Otherwise, append to the end
+              return {
+                ...list,
+                cards: [...list.cards, cardToMove],
+              };
+            }
+            return list;
+          });
+        });
+
+        // Save to backend
+        try {
+          const { cardClient } = await import('../infrastructure/api/card.client');
+          await cardClient.moveCard({
+            cardId: active.id as string,
+            fromListId,
+            toListId,
+          });
+          console.log('✅ Card moved and saved to backend');
+        } catch (error) {
+          console.error('❌ Failed to save card position:', error);
+          // Don't revert UI - keep the change visible
+          // await fetchLists(); // Keep this commented out
+        }
+      } else if (overData?.type === 'card') {
+        // Reordering within the same list
         setLists((prevLists) =>
           prevLists.map((list) => {
-            if (list.id === activeListId) {
+            if (list.id === fromListId) {
               const oldIndex = list.cards.findIndex((c) => c._id === active.id);
               const newIndex = list.cards.findIndex((c) => c._id === over.id);
+
+              if (oldIndex === -1 || newIndex === -1) return list;
+
               return {
                 ...list,
                 cards: arrayMove(list.cards, oldIndex, newIndex),
@@ -177,6 +211,8 @@ export default function DashboardPage() {
             return list;
           })
         );
+        console.log('✅ Card reordered in list');
+        // Note: Backend doesn't have endpoint for reordering within same list yet
       }
     }
   };

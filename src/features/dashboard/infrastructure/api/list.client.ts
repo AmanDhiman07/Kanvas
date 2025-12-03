@@ -1,6 +1,6 @@
 import { httpClient } from '../../../../lib/http';
 import { API_ENDPOINTS } from '../../../../constants/api';
-import type { CreateListRequest, CreateListResponse, GetListsResponse, List } from './list.types';
+import type { CreateListRequest, CreateListResponse, GetListsResponse, List, MoveListRequest, MoveListResponse } from './list.types';
 
 export const listClient = {
   async createList(request: CreateListRequest): Promise<CreateListResponse> {
@@ -44,6 +44,26 @@ export const listClient = {
       throw new Error('Failed to fetch lists: Invalid response format');
     } catch (error) {
       console.error('Fetch lists error:', error);
+      throw error;
+    }
+  },
+
+  async moveList(request: MoveListRequest): Promise<MoveListResponse> {
+    try {
+      const response = await httpClient.put<MoveListResponse>(
+        API_ENDPOINTS.LIST.MOVE,
+        request
+      );
+
+      const moveData = response.data as MoveListResponse;
+
+      if (moveData && moveData.data && moveData.data.success) {
+        return moveData;
+      }
+
+      throw new Error('List move failed: Invalid response format');
+    } catch (error) {
+      console.error('Move list error:', error);
       throw error;
     }
   },

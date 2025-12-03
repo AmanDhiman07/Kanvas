@@ -15,3 +15,18 @@ export interface AddCardResponse {
     };
 }
 
+export interface MoveCardRequest {
+    cardId: string;
+    fromListId: string;
+    toListId: string;
+}
+
+export interface MoveCardResponse {
+    status: boolean;
+    message: string;
+    statusCode: number;
+    data: {
+        success: boolean;
+    };
+}
+

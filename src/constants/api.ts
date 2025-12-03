@@ -6,9 +6,11 @@ export const API_ENDPOINTS = {
     LIST: {
         GET_ALL: '/list/titles',
         CREATE: '/list/title',
+        MOVE: '/list/lists/move',
     },
     // Card endpoints
     CARD: {
         CREATE: (titleId: string) => `/list/title/${titleId}/card`,
+        MOVE: '/list/cards/move',
     },
 } as const;
