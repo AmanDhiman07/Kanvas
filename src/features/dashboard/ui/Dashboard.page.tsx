@@ -7,7 +7,7 @@ import { useList } from '../hooks/useList';
 
 export default function DashboardPage() {
   const [isAddingList, setIsAddingList] = useState(false);
-  const { lists, loading, creating, error, createList, fetchLists } = useList();
+  const { lists, setLists, loading, creating, error, createList, fetchLists } = useList();
 
   const handleAddList = () => {
     setIsAddingList(true);
@@ -27,15 +27,38 @@ export default function DashboardPage() {
 
   const handleAddCard = async (listId: string, cardTitle: string): Promise<boolean> => {
     try {
+      // Optimistically update the UI immediately
+      setLists((prevLists) =>
+        prevLists.map((list) =>
+          list.id === listId
+            ? {
+              ...list,
+              cards: [
+                ...list.cards,
+                {
+                  card: cardTitle,
+                  _id: `temp-${Date.now()}-${Math.random()}`, // Temporary ID until server confirms
+                  createdAt: new Date().toISOString(),
+                },
+              ],
+            }
+            : list
+        )
+      );
+
+      // Save to server in the background
       const { cardClient } = await import('../infrastructure/api/card.client');
       await cardClient.addCard(listId, cardTitle);
 
-      // Refetch lists to get updated cards data from the server
-      await fetchLists();
+      // Optionally refetch to sync with server (in background, don't await)
+      // This will replace the temp ID with the real server ID
+      fetchLists();
 
       return true;
     } catch (error) {
       console.error('Failed to add card:', error);
+      // Revert the optimistic update on error
+      await fetchLists();
       return false;
     }
   };

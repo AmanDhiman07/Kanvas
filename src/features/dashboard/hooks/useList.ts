@@ -5,6 +5,7 @@ import type { ApiError } from '../../../lib/http';
 
 interface UseListReturn {
   lists: List[];
+  setLists: React.Dispatch<React.SetStateAction<List[]>>;
   loading: boolean;
   creating: boolean;
   error: ApiError | null;
@@ -39,13 +40,13 @@ export function useList(): UseListReturn {
 
     try {
       const response = await listClient.createList(request);
-      
+
       if (response && response.data && response.data.title) {
         // Refetch all lists to get the updated list with id and timestamps
         await fetchLists();
         return true;
       }
-      
+
       return false;
     } catch (err) {
       const apiError = err as ApiError;
@@ -63,6 +64,7 @@ export function useList(): UseListReturn {
 
   return {
     lists,
+    setLists,
     loading,
     creating,
     error,

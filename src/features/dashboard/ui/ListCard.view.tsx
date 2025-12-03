@@ -20,12 +20,14 @@ export function ListCard({ listId, listTitle, cards, onAddCard }: ListCardProps)
     setAddingCardLoading(true);
     try {
       const success = await onAddCard(listId, title);
-      if (success) {
-        setIsAddingCard(false);
-      }
       return success;
+    } catch (error) {
+      console.error('Error in handleAddCard:', error);
+      return false;
     } finally {
       setAddingCardLoading(false);
+      // Always close the form after the request completes
+      setIsAddingCard(false);
     }
   };
 
