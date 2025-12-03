@@ -19,6 +19,7 @@ export interface MoveCardRequest {
     cardId: string;
     fromListId: string;
     toListId: string;
+    newPosition?: number; // Added for reordering
 }
 
 export interface MoveCardResponse {

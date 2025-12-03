@@ -143,8 +143,18 @@ export default function DashboardPage() {
         toListId = overData.listId;
       }
 
+      console.log('🔄 Drag End Debug:', {
+        cardId: active.id,
+        fromListId,
+        toListId,
+        isDifferentList: fromListId !== toListId,
+        overType: overData?.type
+      });
+
       // If moving between different lists
       if (fromListId !== toListId) {
+        let newPosition = 0; // Default to top if not specified
+
         // Update UI immediately
         setLists((prevLists) => {
           const sourceList = prevLists.find((list) => list.id === fromListId);
@@ -165,11 +175,13 @@ export default function DashboardPage() {
               // If dropping on a specific card, insert at that position
               if (overData?.type === 'card') {
                 const targetIndex = list.cards.findIndex((c) => c._id === over.id);
+                newPosition = targetIndex; // Capture position for API
                 const newCards = [...list.cards];
                 newCards.splice(targetIndex, 0, cardToMove);
                 return { ...list, cards: newCards };
               }
               // Otherwise, append to the end
+              newPosition = list.cards.length; // Capture position for API
               return {
                 ...list,
                 cards: [...list.cards, cardToMove],
@@ -179,6 +191,13 @@ export default function DashboardPage() {
           });
         });
 
+        console.log('✅ Card moved in UI. Sending to backend...', {
+          cardId: active.id,
+          fromListId,
+          toListId,
+          newPosition
+        });
+
         // Save to backend
         try {
           const { cardClient } = await import('../infrastructure/api/card.client');
@@ -186,6 +205,7 @@ export default function DashboardPage() {
             cardId: active.id as string,
             fromListId,
             toListId,
+            newPosition, // Send the new position!
           });
           console.log('✅ Card moved and saved to backend');
         } catch (error) {
@@ -195,14 +215,18 @@ export default function DashboardPage() {
         }
       } else if (overData?.type === 'card') {
         // Reordering within the same list
+        const sourceList = lists.find((list) => list.id === fromListId);
+        if (!sourceList) return;
+
+        const oldIndex = sourceList.cards.findIndex((c) => c._id === active.id);
+        const newIndex = sourceList.cards.findIndex((c) => c._id === over.id);
+
+        if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return;
+
+        // Optimistically update UI
         setLists((prevLists) =>
           prevLists.map((list) => {
             if (list.id === fromListId) {
-              const oldIndex = list.cards.findIndex((c) => c._id === active.id);
-              const newIndex = list.cards.findIndex((c) => c._id === over.id);
-
-              if (oldIndex === -1 || newIndex === -1) return list;
-
               return {
                 ...list,
                 cards: arrayMove(list.cards, oldIndex, newIndex),
@@ -211,8 +235,27 @@ export default function DashboardPage() {
             return list;
           })
         );
-        console.log('✅ Card reordered in list');
-        // Note: Backend doesn't have endpoint for reordering within same list yet
+
+        console.log('✅ Card reordered in UI. Sending to backend...', {
+          cardId: active.id,
+          listId: fromListId,
+          newPosition: newIndex
+        });
+
+        // Save to backend
+        try {
+          const { cardClient } = await import('../infrastructure/api/card.client');
+          await cardClient.moveCard({
+            cardId: active.id as string,
+            fromListId: fromListId,
+            toListId: fromListId, // Same list
+            newPosition: newIndex, // Send the new index!
+          });
+          console.log('✅ Card reorder saved to backend');
+        } catch (error) {
+          console.error('❌ Failed to save card reorder:', error);
+          // Don't revert UI
+        }
       }
     }
   };
