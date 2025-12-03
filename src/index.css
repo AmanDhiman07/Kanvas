@@ -1,15 +1,53 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  /* Custom color scheme */
-  --background-color: #DDC3C3;
-  --text-color: #6B3F69;
-  --card-color: #8D5F8C;
+  /* Modern Vibrant Color Palette */
+  --primary-purple: hsl(290, 60%, 45%);
+  --primary-magenta: hsl(320, 55%, 50%);
+  --primary-rose: hsl(340, 60%, 55%);
+  --primary-coral: hsl(15, 70%, 60%);
+  --primary-gold: hsl(45, 85%, 65%);
 
-  color: var(--text-color);
-  background-color: var(--background-color);
+  --accent-cyan: hsl(185, 70%, 55%);
+  --accent-blue: hsl(220, 75%, 60%);
+  --accent-pink: hsl(330, 70%, 65%);
+
+  --dark-purple: hsl(280, 40%, 25%);
+  --medium-purple: hsl(285, 45%, 35%);
+  --light-purple: hsl(290, 40%, 85%);
+
+  /* Gradient Definitions */
+  --gradient-primary: linear-gradient(135deg, hsl(290, 60%, 45%) 0%, hsl(320, 55%, 50%) 50%, hsl(340, 60%, 55%) 100%);
+  --gradient-secondary: linear-gradient(135deg, hsl(220, 75%, 60%) 0%, hsl(280, 60%, 55%) 100%);
+  --gradient-warm: linear-gradient(135deg, hsl(340, 60%, 55%) 0%, hsl(15, 70%, 60%) 50%, hsl(45, 85%, 65%) 100%);
+  --gradient-cool: linear-gradient(135deg, hsl(185, 70%, 55%) 0%, hsl(220, 75%, 60%) 100%);
+  --gradient-glow: radial-gradient(circle at 50% 50%, hsla(320, 70%, 60%, 0.3), transparent 70%);
+
+  /* Background Colors */
+  --bg-base: hsl(290, 25%, 95%);
+  --bg-elevated: hsla(0, 0%, 100%, 0.6);
+  --bg-glass: hsla(0, 0%, 100%, 0.15);
+
+  /* Text Colors */
+  --text-primary: hsl(280, 40%, 25%);
+  --text-secondary: hsl(285, 30%, 45%);
+  --text-muted: hsl(285, 20%, 60%);
+
+  /* Effect Variables */
+  --blur-sm: 8px;
+  --blur-md: 16px;
+  --blur-lg: 24px;
+  --blur-xl: 32px;
+
+  --shadow-sm: 0 2px 8px hsla(280, 40%, 25%, 0.1);
+  --shadow-md: 0 4px 16px hsla(280, 40%, 25%, 0.15);
+  --shadow-lg: 0 8px 32px hsla(280, 40%, 25%, 0.2);
+  --shadow-glow: 0 0 24px hsla(320, 70%, 60%, 0.4);
+
+  color: var(--text-primary);
+  background-color: var(--bg-base);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -17,40 +55,138 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Keyframe Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px hsla(320, 70%, 60%, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 30px hsla(320, 70%, 60%, 0.5);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+}
+
 a {
   font-weight: 500;
-  color: var(--text-color);
+  color: var(--primary-purple);
   text-decoration: inherit;
+  transition: color 0.3s ease;
 }
+
 a:hover {
-  color: var(--card-color);
+  color: var(--primary-magenta);
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: var(--background-color);
-  color: var(--text-color);
+  background-color: var(--bg-base);
+  color: var(--text-primary);
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
-  color: var(--text-color);
+  color: var(--text-primary);
 }
 
 button {
-  border-radius: 8px;
+  border-radius: 12px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.25s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Utility Classes */
+.glass-effect {
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--blur-lg));
+  -webkit-backdrop-filter: blur(var(--blur-lg));
+  border: 1px solid hsla(0, 0%, 100%, 0.2);
+}
+
+.gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.6s ease-out forwards;
+}
+
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

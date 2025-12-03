@@ -1,12 +1,12 @@
 // Reads and validates VITE_* environment variables
 
 interface EnvConfig {
-  // Add environment variables here as needed
+  apiBaseUrl: string;
 }
 
 export function getEnvConfig(): EnvConfig {
   return {
-    // Add environment variable access here
+    apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
   };
 }
 
